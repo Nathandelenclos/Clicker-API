@@ -1,0 +1,18 @@
+#- name: Role base
+#  hosts: all
+#  roles:
+#    - base
+
+- name: Role Mongo
+  hosts: mongo
+  vars_files:
+      - vars.yml
+  roles:
+    - mongo
+
+- name: Role Redis
+  hosts: app
+  vars_files:
+    - vars.yml
+  roles:
+    - app

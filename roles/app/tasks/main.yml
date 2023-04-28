@@ -1,0 +1,30 @@
+---
+
+- name: clone/pull repo
+  become: true
+  git:
+    repo: "{{ repos_app }}"
+    dest: /opt/app
+
+- name: install dependencies
+  become: true
+  npm:
+      path: /opt/app
+
+- name: upload .service
+  become: true
+  register: service
+  template:
+    src: ../files/app.service
+    dest: /etc/systemd/system/
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: start service
+  when: service.changed
+  become: true
+  systemd:
+    name: app
+    state: restarted
+    enabled: yes

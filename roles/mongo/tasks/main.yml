@@ -1,0 +1,49 @@
+---
+
+- name: Ajouter le référentiel MongoDB
+  become: true
+  apt_key:
+    url: https://www.mongodb.org/static/pgp/server-{{ mongo_version }}.asc
+    state: present
+
+- name: Ajouter le référentiel MongoDB
+  become: true
+  apt_repository:
+    repo: "deb http://repo.mongodb.org/apt/debian {{ ansible_distribution_release }}/mongodb-org/{{ mongo_version }} main"
+    state: present
+
+- name: Installer MongoDB
+  become: true
+  apt:
+    name: mongodb-org
+    state: present
+    update_cache: yes
+
+- name: Installer le pilote MongoDB pour Python
+  become: true
+  pip:
+    name: pymongo
+    state: present
+
+- name: Start MongoDB
+  become: true
+  service:
+    name: mongod
+    state: started
+
+- name: Créer un utilisateur MongoDB
+  register: user_create
+  mongodb_user:
+    database: "{{ mongo_db }}"
+    name: "{{ mongo_user }}"
+    password: "{{ mongo_pass }}"
+    state: present
+    roles:
+      - readWrite
+
+- name: Redémarrer MongoDB
+  when: user_create.changed
+  become: true
+  service:
+    name: mongod
+    state: restarted

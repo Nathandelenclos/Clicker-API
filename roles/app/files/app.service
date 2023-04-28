@@ -1,0 +1,21 @@
+[Unit]
+Description=App service
+After=network.target
+
+[Service]
+User=root
+Environment="PORT={{ port }}"
+Environment="MONGO_HOST={{ mongo_host }}"
+Environment="MONGO_PORT={{ mongo_port }}"
+Environment="MONGO_DB={{ mongo_db }}"
+Environment="MONGO_USER={{ mongo_user }}"
+Environment="MONGO_PASS={{ mongo_pass }}"
+Environment="JWT_SECRET={{ jwt_secret }}"
+Environment="SALT_ROUNDS={{ salt_rounds }}"
+
+WorkingDirectory=/opt/app
+ExecStart=/usr/bin/node node_modules/ts-node/dist/bin.js src/server.ts
+Restart=always
+RestartSec=10
+[Install]
+WantedBy=multi-user.target
